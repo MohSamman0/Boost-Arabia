@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.662908961146-grh6hu2on9i1v75vj3g6gf7fcpmg619t"
+        }
+      ]
+      
+    ],
+    "name": "BoostArabia",
+    "slug": "BoostArabia",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#101b23"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.0decoy.BoostArabia"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.x0decoy.BoostArabia"
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b4bfa9be-4f07-4cd3-b15e-8e73dc93241e"
+      }
+    }
+  }
+}
