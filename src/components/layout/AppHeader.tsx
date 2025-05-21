@@ -4,8 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 const MainHeader: React.FC<{ gender: 'male' | 'female'; toggleTheme: () => void; isDarkMode: boolean }> = ({ gender, toggleTheme, isDarkMode }) => {
   const avatarSource = gender === 'male' 
-    ? require('../assets/avatar_male.png') 
-    : require('../assets/avatar_male.png'); // Correct avatar image based on gender
+    ? require('../../assets/default-avatar.png') 
+    : require('../../assets/default-avatar.png'); // Correct avatar image based on gender
 
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>

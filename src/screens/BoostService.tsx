@@ -12,18 +12,20 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import MainHeader from '../components/MainHeader';
-import Footer from '../components/Footer';
-import { ThemeContext } from '../src/ThemeContext';
-import GameSelector, { Game } from '../components/GameSelector';
-import ServiceSelector from '../components/ServiceSelector';
-import RankCard from '../components/RankCard';
-import AddOnSelector from '../components/AddOnSelector';
-import PricingSummary from '../components/PricingSummary';
-import RegionModal from '../components/RegionModal';
-import PlatformModal from '../components/PlatformModal';
+import AppHeader from '../components/layout/AppHeader';
+import AppFooter from '../components/layout/AppFooter';
+import { ThemeContext } from '../theme/ThemeContext';
+import GameSelector, { Game } from '../components/forms/GameSelector';
+import ServiceSelector from '../components/forms/ServiceSelector';
+import RankSelector from '../components/forms/RankSelector';
+import AddOnSelector from '../components/forms/AddOnSelector';
+import PricingSummary from '../components/forms/PricingSummary';
+import RegionModal from '../components/forms/RegionModal';
+import PlatformModal from '../components/forms/PlatformModal';
 // Updated StepProgressBar that now supports final-step completion
-import StepProgressBar from '../components/StepProgressBar';
+import StepProgressBar from '../components/common/StepProgressBar';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { FadeIn, SlideIn } from '../components/common/Animations';
 
 const rankConfigs: { [key: string]: { ranks: any[]; subTiers: string[] } } = {
   Valorant: {
@@ -341,7 +343,7 @@ const Boost: React.FC = () => {
 
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-      <MainHeader gender="male" toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+      <AppHeader gender="male" toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
 
       <StepProgressBar
         currentStep={currentStep}
@@ -392,7 +394,7 @@ const Boost: React.FC = () => {
                 <Text style={[styles.helpText, isDarkMode && styles.darkText]}>How to select ranks</Text>
               </TouchableOpacity>
               
-              <RankCard
+              <RankSelector
                 cardTitle="Current Rank"
                 cardSubtitle="Select your current rank and division"
                 ranks={rankConfigs[selectedGame?.name || 'Valorant'].ranks}
@@ -414,7 +416,7 @@ const Boost: React.FC = () => {
                 accessibilityHint="Select your current rank and division"
               />
 
-              <RankCard
+              <RankSelector
                 cardTitle="Desired Rank"
                 cardSubtitle="Choose your target rank and division"
                 ranks={rankConfigs[selectedGame?.name || 'Valorant'].ranks}
@@ -535,7 +537,7 @@ const Boost: React.FC = () => {
         isDarkMode={isDarkMode}
       />
 
-      <Footer isDarkMode={isDarkMode} activeTab="Boost" />
+      <AppFooter isDarkMode={isDarkMode} activeTab="Boost" />
     </View>
   );
 };

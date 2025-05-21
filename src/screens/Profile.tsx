@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import Footer from '../components/Footer';
+import AppFooter from '../components/layout/AppFooter';
 
 const ProfileScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("Profile");
@@ -36,7 +36,7 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.profileSection}>
             <View style={styles.profileImageContainer}>
               <Image
-                source={require("../assets/swordsman.png")}
+                source={require("../assets/profile-placeholder.png")}
                 style={styles.profileImage}
               />
               <TouchableOpacity style={styles.cameraIcon}>
@@ -86,7 +86,7 @@ const ProfileScreen: React.FC = () => {
         </ScrollView>
 
         {/* Footer */}
-        <Footer activeTab="Profile" />
+        <AppFooter activeTab="Profile" />
       </View>
     </SafeAreaView>
   );

@@ -14,7 +14,7 @@ import {
 import { ErrorBoundary } from './ErrorBoundary';
 import { Skeleton } from './Skeleton';
 // import { SlideInView } from './Animations';
-import { colors } from '../src/theme/colors';
+import { colors } from '../../theme/colors';
 
 export interface Game {
   id: string;

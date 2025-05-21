@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
-import BASE_URL from '../helpers/config';
+import BASE_URL from '../utils/config';
 
-const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-  const { email } = route.params;
+const SignUpOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
+  const { email, password, name } = route.params;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(30);
@@ -72,7 +72,7 @@ const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
     if (canResend) {
       setIsLoading(true);
       try {
-        const response = await axios.post(`${BASE_URL}/api/auth/resend-otp-signin`, { email });
+        const response = await axios.post(`${BASE_URL}/api/auth/resend-otp-signup`, { email });
         setIsLoading(false);
         if (response.data.success) {
           setTimer(30);
@@ -93,9 +93,11 @@ const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
     if (otpValue.length === 6) {
       setIsLoading(true);
       try {
-        const response = await axios.post(`${BASE_URL}/api/auth/verify-otp-signin`, { 
+        const response = await axios.post(`${BASE_URL}/api/auth/verify-otp-signup`, { 
           email, 
-          otp: otpValue 
+          otp: otpValue,
+          password,
+          name
         });
         setIsLoading(false);
         if (response.data.success) {
@@ -323,4 +325,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignInOTP;
+export default SignUpOTP;

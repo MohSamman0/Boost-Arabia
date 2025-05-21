@@ -2,11 +2,14 @@ import { Order as OrderType } from '../screens/Order';
 
 
 export type RootStackParamList = {
-  Home: undefined;
+  Home: { gender: 'male' | 'female' };
   Order: undefined;
   OrderDetails: { order: OrderType };
   Profile: { userId: string };
   Boost: undefined;
+  SignIn: undefined;
+  SignInOTP: undefined;
+  SignUp: undefined;
   GameDetails: {
     gameId: string;
     gameName: string;

@@ -10,22 +10,25 @@ import {
   Platform,
   RefreshControl,
   ActivityIndicator,
+  Image,
+  useWindowDimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RootStackParamList } from '../types/Navigation-Types';
+import type { RootStackParamList } from '../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
 
-import MainHeader from '../components/MainHeader';
-import Footer from '../components/Footer';
-import PopularGamesSection, { Game as PopularGame } from '../components/PopularGamesSection';
-import { ThemeContext } from '../src/ThemeContext';
-import { colors } from '../src/theme/colors';
+import AppHeader from '../components/layout/AppHeader';
+import AppFooter from '../components/layout/AppFooter';
+import GameCarousel, { Game as PopularGame } from '../components/common/GameCarousel';
+import { ThemeContext } from '../theme/ThemeContext';
+import { colors } from '../theme/colors';
 import type { GameScreenParams, ActiveOrder } from '../types/Game';
-import { ErrorBoundary } from '../components/ErrorBoundary';
-import { FadeIn, SlideIn } from '../components/Animations';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { FadeIn, SlideIn } from '../components/common/Animations';
 
 type HomeNavProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type HomeRouteProp = RouteProp<RootStackParamList, 'Home'>;
 
 const popularGames: PopularGame[] = [
   {
@@ -48,8 +51,10 @@ const popularGames: PopularGame[] = [
   },
 ];
 
-const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
+const Home: React.FC = () => {
   const navigation = useNavigation<HomeNavProp>();
+  const route = useRoute<HomeRouteProp>();
+  const { gender } = route.params;
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isGamesLoading, setIsGamesLoading] = useState(true);
@@ -99,7 +104,7 @@ const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
   return (
     <ErrorBoundary>
       <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <MainHeader gender={gender} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+        <AppHeader gender={gender} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -206,7 +211,7 @@ const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
           {/* Popular Games */}
           <ErrorBoundary>
             <SlideIn from="bottom" duration={500} delay={900}>
-              <PopularGamesSection
+              <GameCarousel
                 games={popularGames}
                 onGamePress={handleGamePress}
                 isDarkMode={isDarkMode}
@@ -216,7 +221,7 @@ const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
           </ErrorBoundary>
         </ScrollView>
 
-        <Footer isDarkMode={isDarkMode} activeTab="Home" />
+        <AppFooter isDarkMode={isDarkMode} activeTab="Home" />
       </View>
     </ErrorBoundary>
   );

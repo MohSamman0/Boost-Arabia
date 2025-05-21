@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import defaultShield from '../../assets/rank_icons/default_shield.png';
 
 export interface Rank {
   id: string;
@@ -76,7 +77,7 @@ const RankCard: React.FC<RankCardProps> = ({
     >
       <View style={styles.header}>
         <Image
-          source={selectedRankConfig?.icon || require('../assets/rank_icons/default_shield.png')}
+          source={selectedRankConfig?.icon || defaultShield}
           style={[styles.headerIconImage, isDarkMode && styles.darkHeaderIconImage]}
         />
         <View>

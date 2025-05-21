@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, ViewStyle } from 'react-native';
 
-interface AnimationProps {
+interface Props {
   style?: ViewStyle;
   duration?: number;
   delay?: number;
   children: React.ReactNode;
+  from?: 'left' | 'right' | 'top' | 'bottom';
+  distance?: number;
 }
 
-export const FadeIn: React.FC<AnimationProps> = ({
+const FadeInComponent: React.FC<Props> = ({
   style,
   duration = 300,
   delay = 0,
@@ -32,10 +34,7 @@ export const FadeIn: React.FC<AnimationProps> = ({
   );
 };
 
-export const SlideIn: React.FC<AnimationProps & {
-  from?: 'left' | 'right' | 'top' | 'bottom';
-  distance?: number;
-}> = ({
+const SlideInComponent: React.FC<Props> = ({
   style,
   duration = 300,
   delay = 0,
@@ -84,3 +83,6 @@ export const SlideIn: React.FC<AnimationProps & {
     </Animated.View>
   );
 };
+export const FadeIn = React.memo(FadeInComponent);
+export const SlideIn = React.memo(SlideInComponent);
+

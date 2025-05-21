@@ -1,20 +1,32 @@
-// NavigationConfig.js
+// NavigationConfig.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/Home';
-import BoostScreen from '../screens/Boost'; // New Boost screen added
+import BoostService from '../screens/BoostService';
 import SignInScreen from '../screens/SignIn';
 import SignInOTPScreen from '../screens/SignInOTP';
 import SignUpScreen from '../screens/SignUP';
 import SignUpOTPScreen from '../screens/SignUpOTP';
-import OrderScreen from '../screens/Order';
+import OrderHistory from '../screens/OrderHistory';
 import ProfileScreen from '../screens/Profile';
 import OrderDetailsScreen from '../screens/OrderDetails';
 
-const Stack = createStackNavigator();
+export type RootStackParamList = {
+  Home: { gender: 'male' | 'female' };
+  Boost: undefined;
+  SignIn: undefined;
+  SignInOTP: undefined;
+  SignUp: undefined;
+  SignUpOTP: undefined;
+  Order: undefined;
+  Profile: undefined;
+  OrderDetails: undefined;
+};
 
-const App = () => {
+const Stack = createStackNavigator<RootStackParamList>();
+
+const MyStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
@@ -44,16 +56,17 @@ const App = () => {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
+          initialParams={{ gender: 'male' }}
           options={{ headerShown: false }}  
         />
         <Stack.Screen 
           name="Boost" 
-          component={BoostScreen} 
+          component={BoostService} 
           options={{ headerShown: false }}  
         />
         <Stack.Screen 
           name="Order" 
-          component={OrderScreen} 
+          component={OrderHistory} 
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
@@ -61,9 +74,14 @@ const App = () => {
           component={ProfileScreen} 
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="OrderDetails" 
+          component={OrderDetailsScreen} 
+          options={{ headerShown: false }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-export default App;
+export default MyStack;

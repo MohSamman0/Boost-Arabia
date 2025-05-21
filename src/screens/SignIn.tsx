@@ -17,7 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BASE_URL from '../helpers/config'; // Import the base URL
+import BASE_URL from '../utils/config'; // Updated import path
 
 const IconFA: React.FC<{ name: string; size: number; color: string; style?: any }> = ({
   name,

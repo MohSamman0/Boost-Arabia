@@ -17,8 +17,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { RootStackParamList } from '../types/Navigation-Types';
-import Footer from '../components/Footer';
+import type { RootStackParamList } from '../types/navigation';
+import AppFooter from '../components/layout/AppFooter';
 
 export interface Order {
   id: string;
@@ -145,7 +145,7 @@ const OrderScreen: React.FC = () => {
         )}
       </KeyboardAvoidingView>
 
-      <Footer activeTab="Order" />
+      <AppFooter activeTab="Order" />
     </SafeAreaView>
   );
 };

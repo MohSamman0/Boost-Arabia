@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import axios from 'axios';
-import BASE_URL from '../helpers/config'; // Import the base URL
+import BASE_URL from '../utils/config'; // Updated import path
 
 const SignUpScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState('');
