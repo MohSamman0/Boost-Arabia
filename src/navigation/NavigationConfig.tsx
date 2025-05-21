@@ -9,8 +9,8 @@ import SignInOTPScreen from '../screens/SignInOTP';
 import SignUpScreen from '../screens/SignUP';
 import SignUpOTPScreen from '../screens/SignUpOTP';
 import OrderHistory from '../screens/OrderHistory';
-import ProfileScreen from '../screens/Profile';
 import OrderDetailsScreen from '../screens/OrderDetails';
+import SettingsScreen from '../screens/Settings';
 
 export type RootStackParamList = {
   Home: { gender: 'male' | 'female' };
@@ -20,7 +20,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   SignUpOTP: undefined;
   Order: undefined;
-  Profile: undefined;
+  Settings: undefined;
   OrderDetails: undefined;
 };
 
@@ -70,8 +70,8 @@ const MyStack = () => {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="Profile" 
-          component={ProfileScreen} 
+          name="Settings" 
+          component={SettingsScreen} 
           options={{ headerShown: false }} 
         />
         <Stack.Screen 

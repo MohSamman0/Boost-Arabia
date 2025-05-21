@@ -9,12 +9,12 @@ type FooterRoutes = {
   Home: undefined;
   Boost: undefined;
   Order: undefined;
-  Profile: undefined;
+  Settings: undefined;
 };
 
 interface FooterProps {
   isDarkMode?: boolean;
-  activeTab?: string; // "Home", "Boost", "Orders", "Profile"
+  activeTab?: string; // "Home", "Boost", "Orders", "Settings"
 }
 
 const Footer: React.FC<FooterProps> = ({ isDarkMode, activeTab }) => {
@@ -104,22 +104,22 @@ const Footer: React.FC<FooterProps> = ({ isDarkMode, activeTab }) => {
         </Text>
       </TouchableOpacity>
 
-      {/* Profile Tab */}
+      {/* Settings Tab */}
       <TouchableOpacity
         style={styles.tab}
-        onPress={() => handleNavigation('Profile')}
+        onPress={() => handleNavigation('Settings')}
       >
-        <View style={tabStyles('Profile').highlightStyle}>
-          <Ionicons name="person" size={iconSize} color={tabStyles('Profile').iconColor} />
+        <View style={tabStyles('Settings').highlightStyle}>
+          <Ionicons name="settings" size={iconSize} color={tabStyles('Settings').iconColor} />
         </View>
         <Text
           style={[
             styles.tabText,
-            { color: tabStyles('Profile').textColor, fontWeight: tabStyles('Profile').textWeight },
+            { color: tabStyles('Settings').textColor, fontWeight: tabStyles('Settings').textWeight },
             isDarkMode && styles.darkTabText,
           ]}
         >
-          Profile
+          Settings
         </Text>
       </TouchableOpacity>
     </View>

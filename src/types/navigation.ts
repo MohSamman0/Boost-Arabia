@@ -5,11 +5,11 @@ export type RootStackParamList = {
   Home: { gender: 'male' | 'female' };
   Order: undefined;
   OrderDetails: { order: OrderType };
-  Profile: { userId: string };
   Boost: undefined;
   SignIn: undefined;
   SignInOTP: undefined;
   SignUp: undefined;
+  Settings: undefined;
   GameDetails: {
     gameId: string;
     gameName: string;
@@ -28,7 +28,6 @@ export type BottomTabParamList = {
 export type DrawerParamList = {
     Dashboard: undefined;
     Notifications: undefined;
-    Account: undefined;
 };
 
 export interface Order {
@@ -36,4 +35,4 @@ export interface Order {
     title: string;
     status: "Delivered" | "Processing" | "Cancelled";
     date: string;
-  }
+}
