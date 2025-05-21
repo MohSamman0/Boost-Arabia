@@ -1,18 +1,20 @@
 // components/PopularGamesSection.tsx
 
-import React, { FC, useRef, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
   StyleSheet,
-  Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  useWindowDimensions,
   Platform,
 } from 'react-native';
+import { ErrorBoundary } from './ErrorBoundary';
+import { Skeleton } from './Skeleton';
+// import { SlideInView } from './Animations';
+import { colors } from '../src/theme/colors';
 
 export interface Game {
   id: string;
@@ -24,71 +26,87 @@ export interface Game {
 interface Props {
   games: Game[];
   onGamePress: (game: Game) => void;
-  isDarkMode?: boolean;
+  isDarkMode: boolean;
+  isLoading?: boolean;
 }
 
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.8;
-const SPACING = 10;
-
-const PopularGamesSection: FC<Props> = ({ games, onGamePress, isDarkMode = false }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const listRef = useRef<FlatList>(null);
-
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const x = e.nativeEvent.contentOffset.x;
-    const idx = Math.round(x / (CARD_WIDTH + SPACING));
-    if (idx !== activeIndex) {
-      setActiveIndex(idx);
-    }
-  };
+const GameSkeleton: React.FC = () => {
+  const { width } = useWindowDimensions();
+  const cardWidth = width * 0.8;
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, isDarkMode && styles.darkTitle]}>Popular Games</Text>
+    <View style={[styles.card, { width: cardWidth }]}>
+      <Skeleton width="100%" height={160} borderRadius={12} />
+      <View style={styles.info}>
+        <Skeleton width={150} height={20} style={{ marginBottom: 8 }} />
+        <Skeleton width={200} height={16} />
+      </View>
+    </View>
+  );
+};
 
-      <FlatList
-        ref={listRef}
-        data={games}
-        keyExtractor={(item) => item.id}
+const PopularGamesSection: React.FC<Props> = ({
+  games,
+  onGamePress,
+  isDarkMode,
+  isLoading = false,
+}) => {
+  const theme = isDarkMode ? colors.dark : colors.light;
+  const { width } = useWindowDimensions();
+  const cardWidth = width * 0.8;
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {[1, 2].map((key) => (
+            <GameSkeleton key={key} />
+          ))}
+        </ScrollView>
+      );
+    }
+
+    return (
+      <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + SPACING}
-        decelerationRate="fast"
-        contentContainerStyle={{ paddingHorizontal: SPACING / 2 }}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        renderItem={({ item }) => (
+        contentContainerStyle={styles.scrollContent}
+      >
+        {games.map((game, index) => (
           <TouchableOpacity
-            style={[styles.card, { width: CARD_WIDTH, marginRight: SPACING }]}
+            key={game.id}
+            style={[styles.card, { width: cardWidth }]}
+            onPress={() => onGamePress(game)}
             activeOpacity={0.8}
-            onPress={() => onGamePress(item)}
           >
-            <Image source={item.image} style={styles.image} />
+            <Image source={game.image} style={styles.image} />
             <View style={styles.info}>
-              <Text style={styles.name} numberOfLines={1}>
-                {item.name}
+              <Text style={[styles.name, { color: theme.text }]}>
+                {game.name}
               </Text>
-              <Text style={styles.desc} numberOfLines={2}>
-                {item.description}
+              <Text style={[styles.desc, { color: theme.subtext }]}>
+                {game.description}
               </Text>
             </View>
           </TouchableOpacity>
-        )}
-      />
-
-      <View style={styles.dots}>
-        {games.map((_, idx) => (
-          <View
-            key={idx}
-            style={[
-              styles.dot,
-              activeIndex === idx && styles.activeDot,
-            ]}
-          />
         ))}
+      </ScrollView>
+    );
+  };
+
+  return (
+    <ErrorBoundary>
+      <View style={styles.container}>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>
+          Popular Games
+        </Text>
+        {renderContent()}
       </View>
-    </View>
+    </ErrorBoundary>
   );
 };
 
@@ -96,28 +114,28 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 16,
   },
-  title: {
-    fontSize: 18,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    marginBottom: 16,
   },
-  darkTitle: {
-    color: '#fff',
+  scrollContent: {
+    paddingRight: 16,
   },
   card: {
-    backgroundColor: '#243447',
+    marginLeft: 16,
     borderRadius: 12,
     overflow: 'hidden',
+    backgroundColor: '#000',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.12,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 3 },
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
       },
       android: {
-        elevation: 4,
+        elevation: 5,
       },
     }),
   },
@@ -138,21 +156,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#94a3b8',
     marginTop: 4,
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#635BFF',
   },
 });
 

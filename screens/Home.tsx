@@ -1,6 +1,6 @@
 // screens/Home.tsx
 
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -18,6 +20,10 @@ import MainHeader from '../components/MainHeader';
 import Footer from '../components/Footer';
 import PopularGamesSection, { Game as PopularGame } from '../components/PopularGamesSection';
 import { ThemeContext } from '../src/ThemeContext';
+import { colors } from '../src/theme/colors';
+import type { GameScreenParams, ActiveOrder } from '../types/Game';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { FadeIn, SlideIn } from '../components/Animations';
 
 type HomeNavProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -42,16 +48,33 @@ const popularGames: PopularGame[] = [
   },
 ];
 
-type GameScreenParams = {
-  gameId: string;
-  gameName: string;
-  gameDescription: string;
-  gameImage: any;
-};
-
 const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
   const navigation = useNavigation<HomeNavProp>();
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGamesLoading, setIsGamesLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [activeOrder, setActiveOrder] = useState<ActiveOrder | null>({
+    id: '1',
+    gameName: 'Valorant Rank Boost',
+    status: 'in_progress',
+    estimatedTimeRemaining: '2h',
+  });
+
+  useEffect(() => {
+    // Simulate games loading
+    const timer = setTimeout(() => {
+      setIsGamesLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    // TODO: Implement refresh logic here
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
 
   const handleGamePress = (game: PopularGame) => {
     navigation.navigate(
@@ -66,103 +89,142 @@ const Home: React.FC<{ gender: 'male' | 'female' }> = ({ gender }) => {
   };
 
   const handleActiveOrderPress = () => {
-    navigation.navigate('Order');
+    if (activeOrder) {
+      navigation.navigate('Order');
+    }
   };
 
+  const theme = isDarkMode ? colors.dark : colors.light;
+
   return (
-    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-      <MainHeader gender={gender} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+    <ErrorBoundary>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <MainHeader gender={gender} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Welcome */}
-        <Text style={[styles.welcomeText, isDarkMode && styles.darkText]}>
-          Welcome back, Alex!
-        </Text>
-        <Text style={[styles.subtext, isDarkMode && styles.darkText]}>
-          Ready to boost your gaming experience?
-        </Text>
-
-        {/* Active Order Card */}
-        <TouchableOpacity
-          style={[styles.activeOrderContainer, isDarkMode && styles.darkActiveOrderContainer]}
-          onPress={handleActiveOrderPress}
-          activeOpacity={0.8}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
         >
-          <View style={styles.activeOrderHeader}>
-            <Text style={[styles.activeOrderTitle, isDarkMode && styles.darkText]}>
-              Active Order
+          <SlideIn from="top" duration={600}>
+            <Text style={[styles.welcomeText, { color: theme.text }]}>
+              Welcome back, Alex!
             </Text>
-            <Text style={[styles.viewDetails, isDarkMode && styles.darkViewDetails]}>
-              View Details
+            <Text style={[styles.subtext, { color: theme.subtext }]}>
+              Ready to boost your gaming experience?
             </Text>
-          </View>
-          <View style={styles.orderCard}>
-            <View style={styles.iconContainer}>
-              <Ionicons
-                name="trophy"
-                size={20}
-                color={isDarkMode ? '#68d6ff' : '#635BFF'}
-              />
-            </View>
-            <View style={styles.orderTextContainer}>
-              <Text style={[styles.orderTitle, isDarkMode && styles.darkText]}>
-                Valorant Rank Boost
-              </Text>
-              <View style={styles.statusContainer}>
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>In Progress</Text>
+          </SlideIn>
+
+          {/* Active Order Card */}
+          <ErrorBoundary>
+            {isLoading ? (
+              <FadeIn duration={400}>
+                <View style={[styles.activeOrderContainer, { backgroundColor: theme.card }]}>
+                  <ActivityIndicator color={theme.primary} />
                 </View>
-                <Text style={[styles.estimatedTime, isDarkMode && styles.darkText]}>
-                  Est. 2h remaining
-                </Text>
+              </FadeIn>
+            ) : activeOrder ? (
+              <SlideIn from="right" duration={500} delay={300}>
+                <TouchableOpacity
+                  style={[styles.activeOrderContainer, { backgroundColor: theme.card }]}
+                  onPress={handleActiveOrderPress}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.activeOrderHeader}>
+                    <Text style={[styles.activeOrderTitle, { color: theme.text }]}>
+                      Active Order
+                    </Text>
+                    <Text style={[styles.viewDetails, { color: theme.primary }]}>
+                      View Details
+                    </Text>
+                  </View>
+                  <View style={styles.orderCard}>
+                    <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? '#1e293b' : '#EDEAFF' }]}>
+                      <Ionicons
+                        name="trophy"
+                        size={20}
+                        color={theme.primary}
+                      />
+                    </View>
+                    <View style={styles.orderTextContainer}>
+                      <Text style={[styles.orderTitle, { color: theme.text }]}>
+                        {activeOrder.gameName}
+                      </Text>
+                      <View style={styles.statusContainer}>
+                        <View style={[styles.statusBadge, { backgroundColor: theme.success.background }]}>
+                          <Text style={[styles.statusText, { color: theme.success.text }]}>
+                            In Progress
+                          </Text>
+                        </View>
+                        {activeOrder.estimatedTimeRemaining && (
+                          <Text style={[styles.estimatedTime, { color: theme.subtext }]}>
+                            Est. {activeOrder.estimatedTimeRemaining} remaining
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </SlideIn>
+            ) : (
+              <FadeIn duration={400} delay={300}>
+                <View style={[styles.activeOrderContainer, { backgroundColor: theme.card }]}>
+                  <Text style={[styles.noOrderText, { color: theme.subtext }]}>
+                    No active orders
+                  </Text>
+                </View>
+              </FadeIn>
+            )}
+          </ErrorBoundary>
+
+          {/* Action Buttons */}
+          <ErrorBoundary>
+            <SlideIn from="left" duration={500} delay={600}>
+              <View style={styles.actionButtonsContainer}>
+                <TouchableOpacity
+                  style={[styles.startBoostButton, { backgroundColor: theme.primary }]}
+                  onPress={() => navigation.navigate('Boost')}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="rocket" size={24} color="#fff" style={styles.buttonIcon} />
+                  <Text style={styles.actionButtonText}>Start a Boost</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.orderHistoryButton, { backgroundColor: theme.secondary }]}
+                  onPress={() => navigation.navigate('Order')}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="reload" size={24} color="#fff" style={styles.buttonIcon} />
+                  <Text style={styles.actionButtonText}>Order History</Text>
+                </TouchableOpacity>
               </View>
-            </View>
-          </View>
-        </TouchableOpacity>
+            </SlideIn>
+          </ErrorBoundary>
 
-        {/* Action Buttons */}
-        <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={[styles.startBoostButton, isDarkMode && styles.darkStartBoostButton]}
-            onPress={() => navigation.navigate('Boost')}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="rocket" size={24} color="#fff" style={styles.buttonIcon} />
-            <Text style={styles.actionButtonText}>Start a Boost</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.orderHistoryButton, isDarkMode && styles.darkOrderHistoryButton]}
-            onPress={() => navigation.navigate('Order')}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="reload" size={24} color="#fff" style={styles.buttonIcon} />
-            <Text style={styles.actionButtonText}>Order History</Text>
-          </TouchableOpacity>
-        </View>
+          {/* Popular Games */}
+          <ErrorBoundary>
+            <SlideIn from="bottom" duration={500} delay={900}>
+              <PopularGamesSection
+                games={popularGames}
+                onGamePress={handleGamePress}
+                isDarkMode={isDarkMode}
+                isLoading={isGamesLoading}
+              />
+            </SlideIn>
+          </ErrorBoundary>
+        </ScrollView>
 
-        {/* Popular Games */}
-        <PopularGamesSection
-          games={popularGames}
-          onGamePress={handleGamePress}
-          isDarkMode={isDarkMode}
-        />
-      </ScrollView>
-
-      <Footer isDarkMode={isDarkMode} activeTab="Home" />
-    </View>
+        <Footer isDarkMode={isDarkMode} activeTab="Home" />
+      </View>
+    </ErrorBoundary>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
-  },
-  darkContainer: {
-    backgroundColor: '#101b23',
   },
   scrollContent: {
     padding: 16,
@@ -171,22 +233,18 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: Platform.OS === 'ios' ? 26 : 24,
     fontWeight: Platform.OS === 'ios' ? '600' : 'bold',
-    color: '#333',
     marginBottom: 8,
-  },
-  darkText: {
-    color: '#fff',
   },
   subtext: {
     fontSize: 16,
-    color: '#666',
     marginBottom: 12,
   },
   activeOrderContainer: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    minHeight: 100,
+    justifyContent: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -199,13 +257,6 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  darkActiveOrderContainer: {
-    backgroundColor: '#1e293b',
-    ...Platform.select({
-      ios: { shadowOpacity: 0.2 },
-      android: { elevation: 4 },
-    }),
-  },
   activeOrderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -214,14 +265,9 @@ const styles = StyleSheet.create({
   activeOrderTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   viewDetails: {
-    color: '#635BFF',
     fontWeight: 'bold',
-  },
-  darkViewDetails: {
-    color: '#68d6ff',
   },
   orderCard: {
     flexDirection: 'row',
@@ -231,7 +277,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#EDEAFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 14,
@@ -242,7 +287,6 @@ const styles = StyleSheet.create({
   orderTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -250,20 +294,21 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   statusBadge: {
-    backgroundColor: '#DFFFE2',
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
   statusText: {
-    color: '#317B42',
     fontSize: 14,
     fontWeight: 'bold',
   },
   estimatedTime: {
     fontSize: 14,
-    color: '#666',
     marginLeft: 8,
+  },
+  noOrderText: {
+    textAlign: 'center',
+    fontSize: 16,
   },
   actionButtonsContainer: {
     flexDirection: 'row',
@@ -272,24 +317,20 @@ const styles = StyleSheet.create({
   },
   startBoostButton: {
     flex: 1,
-    backgroundColor: '#635BFF',
+    flexDirection: 'row',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 10,
-  },
-  darkStartBoostButton: {
-    backgroundColor: '#68d6ff',
   },
   orderHistoryButton: {
     flex: 1,
-    backgroundColor: '#4A4A4A',
+    flexDirection: 'row',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-  },
-  darkOrderHistoryButton: {
-    backgroundColor: '#2a2d34',
+    justifyContent: 'center',
   },
   buttonIcon: {
     marginRight: 8,

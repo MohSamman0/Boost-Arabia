@@ -11,9 +11,11 @@ import {
   Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import BASE_URL from '../helpers/config';
 
-const SignUpOTPScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-  const { email } = route.params;
+const SignUpOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
+  const { email, password, name } = route.params;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(30);
@@ -70,14 +72,9 @@ const SignUpOTPScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     if (canResend) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://192.168.0.149:3000/api/auth/resend-otp-signup', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email })
-        });
-        const data = await response.json();
+        const response = await axios.post(`${BASE_URL}/api/auth/resend-otp-signup`, { email });
         setIsLoading(false);
-        if (data.success) {
+        if (response.data.success) {
           setTimer(30);
           setCanResend(false);
           Alert.alert('OTP Resent', 'A new OTP has been sent to your email.');
@@ -96,14 +93,14 @@ const SignUpOTPScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
     if (otpValue.length === 6) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://192.168.0.149:3000/api/auth/verify-otp-signup', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email, otp: otpValue })
+        const response = await axios.post(`${BASE_URL}/api/auth/verify-otp-signup`, { 
+          email, 
+          otp: otpValue,
+          password,
+          name
         });
-        const data = await response.json();
         setIsLoading(false);
-        if (data.success) {
+        if (response.data.success) {
           navigation.navigate('Home');
         } else {
           setErrorMessage('Invalid OTP. Please try again.');
@@ -126,7 +123,7 @@ const SignUpOTPScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
         >
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Verify Your Account</Text>
+        <Text style={styles.headerTitle}>Verify Your Email</Text>
       </View>
 
       <View style={styles.content}>
@@ -212,120 +209,120 @@ const SignUpOTPScreen: React.FC<{ route: any; navigation: any }> = ({ route, nav
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#101b23',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 16,
-      marginBottom: 20,
-    },
-    backButton: {
-      padding: 8,
-    },
-    headerTitle: {
-      color: 'white',
-      fontSize: 22,
-      fontWeight: 'bold',
-      marginLeft: 16,
-    },
-    content: {
-      flex: 1,
-      paddingHorizontal: 24,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    iconContainer: {
-      marginBottom: 20,
-    },
-    description: {
-      color: '#68d6ff',
-      fontSize: 18,
-      textAlign: 'center',
-      marginBottom: 8,
-    },
-    email: {
-      color: 'white',
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginTop: 8,
-      marginBottom: 24,
-    },
-    otpContainer: {
-      flexDirection: 'row',
-      justifyContent: 'space-evenly',
-      width: '100%',
-      marginBottom: 24,
-    },
-    otpInput: {
-      width: 50,
-      height: 50,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: '#68d6ff',
-      color: 'white',
-      fontSize: 20,
-      textAlign: 'center',
-      backgroundColor: '#1e293b',
-    },
-    verifyButton: {
-      width: '100%',
-      height: 56,
-      backgroundColor: '#333',
-      borderRadius: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 20,
-    },
-    verifyButtonActive: {
-      backgroundColor: '#68d6ff',
-    },
-    verifyButtonText: {
-      color: 'white',
-      fontSize: 18,
-      fontWeight: '600',
-    },
-    resendContainer: {
-      marginTop: 32,
-      alignItems: 'center',
-    },
-    resendText: {
-      color: '#cccccc',
-      fontSize: 16,
-      marginBottom: 10,
-    },
-    resendButtonText: {
-      color: '#68d6ff',
-      fontSize: 16,
-      fontWeight: '600',
-    },
-    resendButtonTextDisabled: {
-      color: '#808080',
-    },
-    errorText: {
-      color: 'red',
-      fontSize: 16,
-      marginTop: 8,
-    },
-    footer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-      backgroundColor: '#101b23',
-    },
-    footerText: {
-      color: '#cccccc',
-      fontSize: 14,
-      textAlign: 'center',
-    },
-    linkText: {
-      color: '#68d6ff',
-      fontSize: 14,
-      fontWeight: '600',
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#101b23',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    marginBottom: 20,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginLeft: 16,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    marginBottom: 20,
+  },
+  description: {
+    color: '#68d6ff',
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  email: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  otpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    marginBottom: 24,
+  },
+  otpInput: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#68d6ff',
+    color: 'white',
+    fontSize: 20,
+    textAlign: 'center',
+    backgroundColor: '#1e293b',
+  },
+  verifyButton: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#333',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  verifyButtonActive: {
+    backgroundColor: '#68d6ff',
+  },
+  verifyButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  resendContainer: {
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  resendText: {
+    color: '#cccccc',
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  resendButtonText: {
+    color: '#68d6ff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  resendButtonTextDisabled: {
+    color: '#808080',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 8,
+  },
+  footer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    backgroundColor: '#101b23',
+  },
+  footerText: {
+    color: '#cccccc',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  linkText: {
+    color: '#68d6ff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
 
-export default SignUpOTPScreen;
+export default SignUpOTP;

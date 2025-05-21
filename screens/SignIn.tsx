@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -17,39 +16,35 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BASE_URL from '../helpers/config'; // Import the base URL
 
-const IconFA: React.FC<{ name: string; size: number; color: string; style?: any }> = ({ name, size, color, style }) => {
+const IconFA: React.FC<{ name: string; size: number; color: string; style?: any }> = ({
+  name,
+  size,
+  color,
+  style,
+}) => {
   const Icon = FontAwesome as any;
   return <Icon name={name} size={size} color={color} style={style} />;
 };
 
-const IconMCI: React.FC<{ name: string; size: number; color: string; style?: any }> = ({ name, size, color, style }) => {
+const IconMCI: React.FC<{ name: string; size: number; color: string; style?: any }> = ({
+  name,
+  size,
+  color,
+  style,
+}) => {
   const Icon = MaterialCommunityIcons as any;
   return <Icon name={name} size={size} color={color} style={style} />;
 };
-
-WebBrowser.maybeCompleteAuthSession();
 
 const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: '662908961146-i4ct0bg1piuq9mmtjbeuvuh5icrbnela.apps.googleusercontent.com',
-    iosClientId: '662908961146-grh6hu2on9i1v75vj3g6gf7fcpmg619t.apps.googleusercontent.com',
-    androidClientId: '662908961146-jrp68srgknc21m7ulejlodjiscvs9dtc.apps.googleusercontent.com',
-    redirectUri: AuthSession.makeRedirectUri(),
-  });
-
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleGetCode = async () => {
     if (!email.trim()) {
@@ -60,12 +55,10 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       setErrorMessage('Please enter a valid email address.');
       return;
     }
-
     setErrorMessage('');
     setIsLoading(true);
 
     try {
-      // Updated endpoint to match the backend
       const response = await axios.post(`${BASE_URL}/api/auth/send-otp-signin`, { email });
       if (response.data.success) {
         navigation.navigate('SignInOTP', { email });
@@ -73,44 +66,14 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         setErrorMessage(response.data.message || 'Failed to send OTP.');
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        setErrorMessage(error.response.data?.message || 'Failed to send OTP. Please try again.');
-      } else {
-        setErrorMessage('Failed to send OTP. Please try again.');
-      }
+      setErrorMessage(
+        axios.isAxiosError(error) && error.response
+          ? error.response.data?.message || 'Failed to send OTP. Please try again.'
+          : 'Failed to send OTP. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
-  };
-
-
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await promptAsync();
-      if (result.type === 'success' && result.authentication?.idToken) {
-        const response = await axios.post(`${BASE_URL}/api/auth/google-signin`, {
-          token: result.authentication.idToken,
-        });
-
-        if (response.data.success) {
-          Alert.alert('Success', 'Google Sign-In successful!');
-        } else {
-          Alert.alert('Error', response.data.message || 'Sign-In failed');
-        }
-      } else {
-        Alert.alert('Error', 'Google Sign-In was cancelled or failed');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong during Google Sign-In');
-    }
-  };
-
-  const handleAppleLogin = () => {
-    Alert.alert('Apple Login', 'Apple login is not implemented yet.');
-  };
-
-  const handleDiscordLogin = () => {
-    Alert.alert('Discord Login', 'Discord login is not implemented yet.');
   };
 
   const handleSignUp = () => {
@@ -157,7 +120,11 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               onPress={handleGetCode}
               disabled={isLoading}
             >
-              {isLoading ? <ActivityIndicator color="#000000" /> : <Text style={styles.getCodeText}>Get Code</Text>}
+              {isLoading ? (
+                <ActivityIndicator color="#000000" />
+              ) : (
+                <Text style={styles.getCodeText}>Get Code</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.divider}>
@@ -165,21 +132,6 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <Text style={styles.dividerText}>OR LOGIN WITH</Text>
               <View style={styles.line} />
             </View>
-
-            <TouchableOpacity style={styles.socialButton} onPress={handleAppleLogin}>
-              <IconFA name="apple" size={20} color="#ffffff" style={styles.icon} />
-              <Text style={styles.socialText}>Login via Apple</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
-              <IconFA name="google" size={20} color="#ffffff" style={styles.icon} />
-              <Text style={styles.socialText}>Login via Google</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.socialButton} onPress={handleDiscordLogin}>
-              <IconMCI name="discord" size={20} color="#ffffff" style={styles.icon} />
-              <Text style={styles.socialText}>Login via Discord</Text>
-            </TouchableOpacity>
 
             <Text style={styles.footer}>
               Don't have an account?{' '}
@@ -195,47 +147,13 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  backgroundImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  overlay: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
-  },
-  appName: {
-    color: '#FFA500',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  title: {
-    color: '#ffffff',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    color: '#8b929a',
-    fontSize: 14,
-    marginBottom: 20,
-  },
+  container: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+  backgroundImage: { position: 'absolute', width: '100%', height: '100%', resizeMode: 'cover' },
+  overlay: { position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)' },
+  logo: { width: 80, height: 80, marginBottom: 10 },
+  appName: { color: '#FFA500', fontSize: 18, fontWeight: 'bold', marginBottom: 20 },
+  title: { color: '#fff', fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
+  subtitle: { color: '#8b929a', fontSize: 14, marginBottom: 20 },
   input: {
     width: '85%',
     height: 50,

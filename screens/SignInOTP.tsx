@@ -11,6 +11,8 @@ import {
   Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import BASE_URL from '../helpers/config';
 
 const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
   const { email } = route.params;
@@ -70,14 +72,9 @@ const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
     if (canResend) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://192.168.0.149:3000/api/auth/resend-otp-signin', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email })
-        });
-        const data = await response.json();
+        const response = await axios.post(`${BASE_URL}/api/auth/resend-otp-signin`, { email });
         setIsLoading(false);
-        if (data.success) {
+        if (response.data.success) {
           setTimer(30);
           setCanResend(false);
           Alert.alert('OTP Resent', 'A new OTP has been sent to your email.');
@@ -96,14 +93,12 @@ const SignInOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
     if (otpValue.length === 6) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://192.168.0.149:3000/api/auth/verify-otp-signin', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email, otp: otpValue })
+        const response = await axios.post(`${BASE_URL}/api/auth/verify-otp-signin`, { 
+          email, 
+          otp: otpValue 
         });
-        const data = await response.json();
         setIsLoading(false);
-        if (data.success) {
+        if (response.data.success) {
           navigation.navigate('Home');
         } else {
           setErrorMessage('Invalid OTP. Please try again.');
