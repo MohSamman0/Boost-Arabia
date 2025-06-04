@@ -1,10 +1,17 @@
-import { Order as OrderType } from '../screens/Order';
-
+export interface Order {
+  id: string;
+  title: string;
+  status: "Delivered" | "Processing" | "Cancelled";
+  date: string;
+  price: number;
+  provider: string;
+  description: string;
+}
 
 export type RootStackParamList = {
   Home: { gender: 'male' | 'female' };
   Order: undefined;
-  OrderDetails: { order: OrderType };
+  OrderDetails: { orderId: string };
   Boost: undefined;
   SignIn: undefined;
   SignInOTP: undefined;
@@ -16,7 +23,6 @@ export type RootStackParamList = {
     gameDescription: string;
     gameImage: any;
   };
-  // Add other routes here
 };
 
 export type BottomTabParamList = {
@@ -29,10 +35,3 @@ export type DrawerParamList = {
     Dashboard: undefined;
     Notifications: undefined;
 };
-
-export interface Order {
-    id: string;
-    title: string;
-    status: "Delivered" | "Processing" | "Cancelled";
-    date: string;
-}
