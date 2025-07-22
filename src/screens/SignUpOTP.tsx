@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import BASE_URL from '../utils/config';
+import { useAuth } from '../navigation/NavigationConfig';
 
 const SignUpOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
   const { email, password, name } = route.params;
@@ -22,6 +23,7 @@ const SignUpOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<Array<TextInput | null>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { signIn } = useAuth();
 
   useEffect(() => {
     if (timer > 0 && !canResend) {
@@ -101,7 +103,7 @@ const SignUpOTP: React.FC<{ route: any; navigation: any }> = ({ route, navigatio
         });
         setIsLoading(false);
         if (response.data.success) {
-          navigation.navigate('Home');
+          signIn();
         } else {
           setErrorMessage('Invalid OTP. Please try again.');
         }

@@ -1,3 +1,4 @@
+// DEPRECATED: This component is no longer used. The app now uses a native tab navigator (createBottomTabNavigator) for the main app sections.
 // Footer.tsx
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, TextStyle } from 'react-native';

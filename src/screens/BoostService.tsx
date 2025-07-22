@@ -13,7 +13,6 @@ import {
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import AppHeader from '../components/layout/AppHeader';
-import AppFooter from '../components/layout/AppFooter';
 import { ThemeContext } from '../theme/ThemeContext';
 import GameSelector, { Game } from '../components/forms/GameSelector';
 import ServiceSelector from '../components/forms/ServiceSelector';
@@ -537,7 +536,6 @@ const Boost: React.FC = () => {
         isDarkMode={isDarkMode}
       />
 
-      <AppFooter isDarkMode={isDarkMode} activeTab="Boost" />
     </View>
   );
 };

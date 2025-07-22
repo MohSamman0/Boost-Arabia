@@ -16,7 +16,6 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RootStackParamList, Order } from '../types/navigation';
 import { ThemeContext } from '../theme/ThemeContext';
 import AppHeader from '../components/layout/AppHeader';
-import AppFooter from '../components/layout/AppFooter';
 import { Ionicons } from '@expo/vector-icons';
 import { FadeIn, SlideIn } from '../components/common/Animations';
 
@@ -247,7 +246,6 @@ const OrderHistory: React.FC = () => {
         </ScrollView>
       </View>
 
-      <AppFooter isDarkMode={isDarkMode} activeTab="Order" />
     </View>
   );
 };

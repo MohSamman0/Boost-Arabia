@@ -58,14 +58,30 @@ const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     setErrorMessage('');
     setIsLoading(true);
 
+    // Debug: Log email and request URL
+    console.log('[DEBUG] Sending OTP for email:', email);
+    console.log('[DEBUG] Request URL:', `${BASE_URL}/api/auth/send-otp-signin`);
+
     try {
       const response = await axios.post(`${BASE_URL}/api/auth/send-otp-signin`, { email });
+      // Debug: Log full response
+      console.log('[DEBUG] OTP Response:', response);
       if (response.data.success) {
         navigation.navigate('SignInOTP', { email });
       } else {
+        console.log('[DEBUG] OTP Error Message:', response.data.message);
         setErrorMessage(response.data.message || 'Failed to send OTP.');
       }
     } catch (error) {
+      // Debug: Log error details
+      if (axios.isAxiosError(error)) {
+        console.log('[DEBUG] Axios error:', error.toJSON());
+        if (error.response) {
+          console.log('[DEBUG] Error response data:', error.response.data);
+        }
+      } else {
+        console.log('[DEBUG] Unknown error:', error);
+      }
       setErrorMessage(
         axios.isAxiosError(error) && error.response
           ? error.response.data?.message || 'Failed to send OTP. Please try again.'

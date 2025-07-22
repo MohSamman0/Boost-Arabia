@@ -5,7 +5,6 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types/navigation';
 import { ThemeContext } from '../theme/ThemeContext';
 import AppHeader from '../components/layout/AppHeader';
-import AppFooter from '../components/layout/AppFooter';
 import { Ionicons } from '@expo/vector-icons';
 
 type SettingsNavProp = StackNavigationProp<RootStackParamList, 'Settings'>;
@@ -211,7 +210,6 @@ const Settings: React.FC = () => {
         </TouchableOpacity>
       </ScrollView>
 
-      <AppFooter isDarkMode={isDarkMode} activeTab="Settings" />
     </View>
   );
 };

@@ -19,7 +19,6 @@ import type { RootStackParamList } from '../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
 
 import AppHeader from '../components/layout/AppHeader';
-import AppFooter from '../components/layout/AppFooter';
 import GameCarousel, { Game as PopularGame } from '../components/common/GameCarousel';
 import { ThemeContext } from '../theme/ThemeContext';
 import { colors } from '../theme/colors';
@@ -190,7 +189,7 @@ const Home: React.FC = () => {
               <View style={styles.actionButtonsContainer}>
                 <TouchableOpacity
                   style={[styles.startBoostButton, { backgroundColor: theme.primary }]}
-                  onPress={() => navigation.navigate('Boost')}
+                  onPress={() => navigation.navigate('BoostTab')}
                   activeOpacity={0.8}
                 >
                   <Ionicons name="rocket" size={24} color="#fff" style={styles.buttonIcon} />
@@ -198,7 +197,7 @@ const Home: React.FC = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.orderHistoryButton, { backgroundColor: theme.secondary }]}
-                  onPress={() => navigation.navigate('Order')}
+                  onPress={() => navigation.navigate('OrdersTab')}
                   activeOpacity={0.8}
                 >
                   <Ionicons name="reload" size={24} color="#fff" style={styles.buttonIcon} />
@@ -221,7 +220,6 @@ const Home: React.FC = () => {
           </ErrorBoundary>
         </ScrollView>
 
-        <AppFooter isDarkMode={isDarkMode} activeTab="Home" />
       </View>
     </ErrorBoundary>
   );
